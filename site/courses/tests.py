@@ -67,3 +67,14 @@ class CourseTests(TestCase):
         )
         response = client.post(f"/api/courses/{course.id}/join/", {}, format="json")
         self.assertEqual(response.status_code, 403)
+
+    def test_professor_claim_requires_approval(self):
+        course = Course.objects.create(
+            university=self.university, code="CS 101", title="Intro to CS"
+        )
+        section = course.default_section
+        response = self.client.post(f"/api/sections/{section.id}/claim/")
+        self.assertEqual(response.status_code, 202)
+        section.refresh_from_db()
+        self.assertTrue(section.claim_pending)
+        self.assertIsNone(section.professor)

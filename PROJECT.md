@@ -67,7 +67,7 @@ GET  /api/courses/<id>/
 POST /api/courses/<id>/join/          { section_id? }
 GET  /api/me/sections/                sections + channels
 GET  /api/sections/<id>/channels/
-POST /api/sections/<id>/claim/        claim an unclaimed section as professor
+POST /api/sections/<id>/claim/        request professor access (admin-approved)
 POST /api/sections/<id>/announcements/ { body, email? }
 
 GET  /api/channels/<id>/messages/?before=

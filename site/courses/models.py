@@ -106,6 +106,15 @@ class Section(models.Model):
     term = models.CharField(max_length=40, blank=True, help_text="e.g. 'Fall 2026'.")
     section_code = models.CharField(max_length=40, blank=True, help_text="e.g. '002'.")
     is_default = models.BooleanField(default=False)
+    claimed_by = models.ForeignKey(
+        "accounts.UserProfile",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="section_claims",
+        help_text="Professor claim awaiting review.",
+    )
+    claim_pending = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

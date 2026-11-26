@@ -145,10 +145,10 @@ class SectionChannelsView(APIView):
 
 
 class ClaimProfessorView(APIView):
-    """Claim an unclaimed section as its professor.
+    """Request to be recognized as a section's professor.
 
-    Claims are reviewed in Django admin; a claim only sets the professor when
-    the section is unclaimed and the requester belongs to the same university.
+    Claims are reviewed in Django admin. Until approved, the claimant gets no
+    moderation powers, so a student can't impersonate a professor.
     """
 
     permission_classes = [IsAuthenticated]
@@ -159,6 +159,8 @@ class ClaimProfessorView(APIView):
             return Response({"detail": "Section not found."}, status=status.HTTP_404_NOT_FOUND)
         if section.professor_id is not None:
             raise ValidationError({"detail": "This section already has a professor."})
+        if section.claim_pending:
+            raise ValidationError({"detail": "A claim for this section is already pending."})
 
         profile = request.user.profile
         if not profile.is_verified:
@@ -166,14 +168,11 @@ class ClaimProfessorView(APIView):
         if profile.university_id != section.course.university_id:
             raise PermissionDenied("You can only claim sections at your own school.")
 
-        section.professor = profile
-        section.save(update_fields=["professor"])
-        profile.role = profile.ROLE_PROFESSOR
-        profile.save(update_fields=["role"])
+        section.claimed_by = profile
+        section.claim_pending = True
+        section.save(update_fields=["claimed_by", "claim_pending"])
 
-        Enrollment.objects.update_or_create(
-            user=request.user,
-            section=section,
-            defaults={"role": Enrollment.ROLE_PROFESSOR},
+        return Response(
+            {"detail": "Claim submitted. An administrator will review it."},
+            status=status.HTTP_202_ACCEPTED,
         )
-        return Response(SectionSerializer(section).data)
