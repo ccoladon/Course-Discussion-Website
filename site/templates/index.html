@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Course Chat — discuss with your class{% endblock %}
+
+{% block content %}
+<main class="mx-auto flex min-h-full max-w-3xl flex-col justify-center px-6 py-20">
+  <div class="mb-4 inline-flex w-fit items-center gap-2 rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700">
+    <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
+    Early build
+  </div>
+  <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
+    Every course, one conversation.
+  </h1>
+  <p class="mt-4 max-w-xl text-lg text-slate-600">
+    Verified students join public chat rooms grouped by course and professor.
+    Questions stay searchable, answers get marked, and the class knowledge
+    doesn't scroll away.
+  </p>
+  <dl class="mt-10 grid gap-4 sm:grid-cols-3">
+    <div class="rounded-xl border border-slate-200 bg-white p-4">
+      <dt class="text-sm font-semibold text-slate-500">Auth</dt>
+      <dd class="mt-1 text-sm">Email OTP, verified by school domain</dd>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4">
+      <dt class="text-sm font-semibold text-slate-500">Chat</dt>
+      <dd class="mt-1 text-sm">Live rooms, threads, pinned answers</dd>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4">
+      <dt class="text-sm font-semibold text-slate-500">Search</dt>
+      <dd class="mt-1 text-sm">Find the answer that was already given</dd>
+    </div>
+  </dl>
+  <p class="mt-10 text-sm text-slate-500">
+    API root: <code class="rounded bg-slate-200 px-1.5 py-0.5">/api/</code> ·
+    Admin: <a class="text-indigo-600 underline" href="/admin/">/admin/</a>
+  </p>
+</main>
+{% endblock %}
