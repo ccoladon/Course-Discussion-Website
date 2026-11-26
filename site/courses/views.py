@@ -9,7 +9,7 @@ from chat.serializers import ChannelSerializer
 from core.text import normalize_course_code
 
 from .models import Course, Enrollment, Section
-from .permissions import is_enrolled_in_course
+from .permissions import can_moderate_section, is_enrolled_in_course
 from .serializers import CourseSerializer, EnrollmentSerializer, SectionSerializer
 
 
@@ -109,17 +109,31 @@ class MySectionsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        enrollments = request.user.enrollments.select_related(
-            "section__course", "section__course__university", "section__professor"
+        course_ids = request.user.enrollments.values_list(
+            "section__course_id", flat=True
+        ).distinct()
+        sections = (
+            Section.objects.filter(course_id__in=course_ids)
+            .select_related("course", "course__university", "professor")
+            .prefetch_related("channels")
+            .order_by("course__code", "-is_default", "section_code")
         )
+        my_enrollments = {
+            enrollment.section_id: enrollment
+            for enrollment in request.user.enrollments.all()
+        }
+
         payload = []
-        for enrollment in enrollments:
-            section = enrollment.section
-            channels = section.channels.all()
+        for section in sections:
+            enrollment = my_enrollments.get(section.id)
             payload.append(
                 {
-                    "enrollment": EnrollmentSerializer(enrollment).data,
-                    "channels": ChannelSerializer(channels, many=True).data,
+                    "section": SectionSerializer(section).data,
+                    "channels": ChannelSerializer(section.channels.all(), many=True).data,
+                    "can_moderate": can_moderate_section(request.user, section),
+                    "my_enrollment": (
+                        EnrollmentSerializer(enrollment).data if enrollment else None
+                    ),
                 }
             )
         return Response({"sections": payload})

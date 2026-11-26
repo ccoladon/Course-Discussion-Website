@@ -50,7 +50,11 @@ class SectionSerializer(serializers.ModelSerializer):
     def get_professor(self, obj):
         if obj.professor is None:
             return None
-        return {"id": obj.professor.id, "name": obj.professor.public_name}
+        return {
+            "id": obj.professor.id,
+            "user_id": obj.professor.user_id,
+            "name": obj.professor.public_name,
+        }
 
 
 class EnrollmentSerializer(serializers.ModelSerializer):

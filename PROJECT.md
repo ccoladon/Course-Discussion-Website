@@ -86,6 +86,7 @@ WS   /ws/channels/<id>/?token=<key>   {"type": "message", "body": "..."}
 
 ```bash
 python manage.py add_school "Stanford University" stanford.edu cs.stanford.edu
+python manage.py seed_demo
 python manage.py send_weekly_digest [--days 7] [--dry-run]
 ```
 

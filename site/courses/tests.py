@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from chat.models import Channel
 from core.testing import auth_client, make_user
-from courses.models import Course, CourseAlias, Enrollment, University
+from courses.models import Course, CourseAlias, Enrollment, Section, University
 
 
 class CourseTests(TestCase):
@@ -78,3 +78,20 @@ class CourseTests(TestCase):
         section.refresh_from_db()
         self.assertTrue(section.claim_pending)
         self.assertIsNone(section.professor)
+
+    def test_my_sections_lists_all_sections_of_enrolled_courses(self):
+        course = Course.objects.create(
+            university=self.university, code="CS 101", title="Intro to CS"
+        )
+        default = course.default_section
+        professor = make_user("prof@stanford.edu", self.university)
+        other = Section.objects.create(
+            course=course, term="Fall 2026", section_code="002", professor=professor.profile
+        )
+        Enrollment.objects.create(user=self.user, section=default)
+
+        response = self.client.get("/api/me/sections/")
+        self.assertEqual(response.status_code, 200)
+        ids = {entry["section"]["id"] for entry in response.data["sections"]}
+        self.assertEqual(ids, {default.id, other.id})
+        self.assertTrue(all(entry["can_moderate"] is False for entry in response.data["sections"]))

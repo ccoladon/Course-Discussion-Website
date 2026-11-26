@@ -14,17 +14,26 @@ pip install -r site/requirements.txt
 cp .env.example .env        # optional; dev defaults work without it
 cd site
 python manage.py migrate
-python manage.py add_school "Stanford University" stanford.edu
-python manage.py createsuperuser
+python manage.py seed_demo   # demo school, users, course, and chat history
 python manage.py runserver
 ```
 
-Open http://localhost:8000 for the landing page, `/admin/` for the admin, and
-`/api/` for the API.
+Open **http://localhost:8000/login/** and sign in as `alice@demo.edu`
+(student) or `prof@demo.edu` (professor).
+
+With no `RESEND_API_KEY` set, the 6-digit code is printed in the server
+terminal:
+
+```
+[email:console] to=['alice@demo.edu'] subject='Your Course Chat sign-in code'
+Your sign-in code is 123456. It expires in 10 minutes.
+```
+
+Other useful URLs: `/` landing page, `/app/` chat client, `/admin/` Django admin,
+`/api/` API.
 
 Without `DATABASE_URL` the app uses SQLite; without `REDIS_URL` the channel
-layer is in-memory (fine for local dev). Without `RESEND_API_KEY`, OTP emails
-are printed to the server log.
+layer is in-memory (fine for local dev).
 
 ## Tests
 

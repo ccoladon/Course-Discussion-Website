@@ -94,6 +94,17 @@ class ChannelMessageListView(APIView):
         return Response(MessageSerializer(message).data, status=status.HTTP_201_CREATED)
 
 
+class ChannelPinnedView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        channel = _channel_for_user(request, pk)
+        messages = channel.messages.filter(
+            is_pinned=True, deleted_at__isnull=True
+        ).select_related("author__profile")[:10]
+        return Response(MessageSerializer(messages, many=True).data)
+
+
 class MessageRepliesView(APIView):
     permission_classes = [IsAuthenticated]
 
