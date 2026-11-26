@@ -67,12 +67,19 @@
       sentTo.textContent = email;
       emailForm.classList.add("hidden");
       codeForm.classList.remove("hidden");
-      codeInput.focus();
+      if (data.dev_code) {
+        codeInput.value = data.dev_code;
+        codeInput.select();
+      } else {
+        codeInput.focus();
+      }
       if (!data.verified_domain) {
         showAlert(
           data.message || "This email domain isn't linked to a school yet.",
           "warn"
         );
+      } else if (data.dev_code) {
+        showAlert("Dev mode: the code was filled in automatically. Click Sign in.", "ok");
       }
     } catch (error) {
       showAlert(error.message);

@@ -71,6 +71,9 @@ class RequestCodeView(APIView):
             {
                 "detail": "Code sent.",
                 "verified_domain": verified,
+                "dev_code": (
+                    code if settings.OTP_DEV_ECHO and settings.DEBUG else None
+                ),
                 "message": (
                     None
                     if verified

@@ -35,6 +35,29 @@ Other useful URLs: `/` landing page, `/app/` chat client, `/admin/` Django admin
 Without `DATABASE_URL` the app uses SQLite; without `REDIS_URL` the channel
 layer is in-memory (fine for local dev).
 
+## Share it on your local network
+
+1. Find your LAN address: `ipconfig getifaddr en0` (e.g. `192.168.1.50`).
+2. Add it to `.env`:
+
+   ```dotenv
+   ALLOWED_HOSTS=localhost,127.0.0.1,192.168.1.50
+   CSRF_TRUSTED_ORIGINS=http://localhost:8000,http://127.0.0.1:8000,http://192.168.1.50:8000
+   OTP_DEV_ECHO=True
+   ```
+
+3. Run the server on all interfaces:
+
+   ```bash
+   python manage.py runserver 0.0.0.0:8000
+   ```
+
+4. Other devices on the same Wi-Fi open `http://192.168.1.50:8000/login/`.
+
+`OTP_DEV_ECHO=True` fills the login code in automatically (it is also gated on
+`DEBUG`), so people on the network can sign in without reading your terminal.
+This is a development server — never expose it to the internet.
+
 ## Tests
 
 ```bash

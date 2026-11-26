@@ -78,3 +78,25 @@ class OTPAuthTests(TestCase):
             "/api/auth/request-code/", {"email": "alice@stanford.edu"}, format="json"
         )
         self.assertEqual(response.status_code, 429)
+
+    def test_dev_code_echo_is_off_by_default(self):
+        response = self.client.post(
+            "/api/auth/request-code/", {"email": "alice@stanford.edu"}, format="json"
+        )
+        self.assertIsNone(response.data.get("dev_code"))
+
+    @override_settings(OTP_DEV_ECHO=True, DEBUG=True)
+    def test_dev_code_echo_when_enabled(self):
+        response = self.client.post(
+            "/api/auth/request-code/", {"email": "alice@stanford.edu"}, format="json"
+        )
+        code = response.data.get("dev_code")
+        self.assertRegex(code, r"^\d{6}$")
+
+        confirm = self.client.post(
+            "/api/auth/confirm-code/",
+            {"email": "alice@stanford.edu", "code": code},
+            format="json",
+        )
+        self.assertEqual(confirm.status_code, 200)
+        self.assertIn("token", confirm.data)

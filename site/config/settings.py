@@ -128,6 +128,9 @@ AUTH_PASSWORD_VALIDATORS = [
 OTP_TTL_SECONDS = config("OTP_TTL_SECONDS", default=600, cast=int)
 OTP_MAX_ATTEMPTS = config("OTP_MAX_ATTEMPTS", default=5, cast=int)
 OTP_RESEND_SECONDS = config("OTP_RESEND_SECONDS", default=30, cast=int)
+# Local/demo convenience: return the code in the API response. Never enable
+# in production; it is additionally gated on DEBUG.
+OTP_DEV_ECHO = config("OTP_DEV_ECHO", default=False, cast=bool)
 
 # ---------------------------------------------------------------------------
 # DRF
