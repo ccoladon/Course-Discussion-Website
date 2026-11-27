@@ -19,6 +19,7 @@
     renderedIds: new Set(),
     threadRoot: null,
     searchMode: false,
+    expandedSectionId: null,
   };
 
   // ---------------------------------------------------------------- helpers
@@ -194,7 +195,10 @@
 
       // Channel list container (hidden by default, shown when section is expanded)
       const channelsContainer = el("div", "mt-2 space-y-1");
-      channelsContainer.style.display = "none";
+      // Show if this section is the currently expanded one
+      channelsContainer.style.display = entry.section.id === state.expandedSectionId ? "block" : "none";
+      // Rotate arrow if expanded
+      arrow.style.transform = entry.section.id === state.expandedSectionId ? "rotate(180deg)" : "rotate(0deg)";
 
       entry.channels.forEach((channel) => {
         const active = state.channel && state.channel.id === channel.id;
@@ -210,6 +214,8 @@
           channel.name
         )}</span>`;
         button.addEventListener("click", () => {
+          // Keep the section open when clicking a channel
+          state.expandedSectionId = entry.section.id;
           closeSidebar();
           openChannel(entry, channel);
         });
@@ -220,9 +226,11 @@
       header.addEventListener("click", (e) => {
         const isButton = e.target.closest("button");
         if (!isButton) {
-          const isCurrentlyHidden = channelsContainer.style.display === "none";
-          channelsContainer.style.display = isCurrentlyHidden ? "block" : "none";
-          arrow.style.transform = isCurrentlyHidden ? "rotate(180deg)" : "rotate(0deg)";
+          // If clicking the same expanded section, collapse it; otherwise expand
+          const wasExpanded = entry.section.id === state.expandedSectionId;
+          state.expandedSectionId = wasExpanded ? null : entry.section.id;
+          channelsContainer.style.display = wasExpanded ? "none" : "block";
+          arrow.style.transform = wasExpanded ? "rotate(0deg)" : "rotate(180deg)";
         }
       });
 
