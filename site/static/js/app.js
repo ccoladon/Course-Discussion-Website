@@ -345,8 +345,10 @@
 
     const article = el(
       "article",
-      "group relative flex gap-3 rounded-lg px-2 py-2 hover:bg-slate-50"
+      "group relative flex gap-3 rounded-lg px-2 py-2 min-h-25 hover:bg-slate-50"
     );
+// Inline fallback for Tailwind JIT (class may not be scanned)
+article.style.minHeight = "100px";
     article.dataset.id = message.id;
 
     const avatar = el(
