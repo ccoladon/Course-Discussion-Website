@@ -179,13 +179,22 @@
       const section = entry.section;
       const group = el("div", "mb-4");
 
+      // Accordion header showing section name with disclosure arrow
       const header = el(
         "div",
-        "truncate px-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400"
+        "truncate px-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400 cursor-pointer relative"
       );
       header.textContent = section.display_name;
       header.title = section.display_name;
-      group.appendChild(header);
+
+      // Disclosure arrow icon
+      const arrow = el("span", "absolute right-2 text-slate-400 transition-transform duration-200");
+      arrow.innerHTML = "▼";
+      header.appendChild(arrow);
+
+      // Channel list container (hidden by default, shown when section is expanded)
+      const channelsContainer = el("div", "mt-2 space-y-1");
+      channelsContainer.style.display = "none";
 
       entry.channels.forEach((channel) => {
         const active = state.channel && state.channel.id === channel.id;
@@ -204,9 +213,21 @@
           closeSidebar();
           openChannel(entry, channel);
         });
-        group.appendChild(button);
+        channelsContainer.appendChild(button);
       });
 
+      // Toggle channels visibility when header is clicked (but not when clicking a channel button)
+      header.addEventListener("click", (e) => {
+        const isButton = e.target.closest("button");
+        if (!isButton) {
+          const isCurrentlyHidden = channelsContainer.style.display === "none";
+          channelsContainer.style.display = isCurrentlyHidden ? "block" : "none";
+          arrow.style.transform = isCurrentlyHidden ? "rotate(180deg)" : "rotate(0deg)";
+        }
+      });
+
+      group.appendChild(header);
+      group.appendChild(channelsContainer);
       list.appendChild(group);
     });
   }
